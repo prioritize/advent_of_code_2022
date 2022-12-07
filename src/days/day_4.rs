@@ -1,6 +1,6 @@
+use regex;
 use std::fs::File;
 use std::io::Read;
-use regex;
 
 struct DayFour {
     output: u32,
@@ -27,7 +27,7 @@ impl Range {
         self.end
     }
     fn new(start: u32, end: u32) -> Self {
-        let mut r = Range{
+        let mut r = Range {
             start,
             end,
             range: 0,
@@ -36,19 +36,15 @@ impl Range {
         r
     }
     fn contained(&self, other: &Range) -> bool {
-       return match other.start() <= self.start() {
-           true => {
-               return match other.end() >= self.end() {
-                   true => {
-                       true
-                   },
-                   false => {
-                       false
-                   }
-               }
-           }
-           false => {false}
-       }
+        return match other.start() <= self.start() {
+            true => {
+                return match other.end() >= self.end() {
+                    true => true,
+                    false => false,
+                }
+            }
+            false => false,
+        };
     }
     fn early_overlap(&self, other: &Range) -> bool {
         self.start <= other.start && self.end >= other.start
@@ -65,11 +61,16 @@ impl DayFour {
         let mut file = File::open(&filename).expect(&format!("Unable to open {}", filename));
         let mut f_string = String::new();
         file.read_to_string(&mut f_string);
-        let re = regex::Regex::new(r"((([0-9]{1,6})-([0-9]{1,6})),(([0-9]{1,6})-([0-9]{1,6})))\n").unwrap();
-        re.captures_iter(&f_string).map(|x| {
-            vec![Range::new(x[3].parse().unwrap(), x[4].parse().unwrap()), Range::new(x[6].parse().unwrap(), x[7].parse().unwrap())]
-            }
-        ).collect()
+        let re = regex::Regex::new(r"((([0-9]{1,6})-([0-9]{1,6})),(([0-9]{1,6})-([0-9]{1,6})))\n")
+            .unwrap();
+        re.captures_iter(&f_string)
+            .map(|x| {
+                vec![
+                    Range::new(x[3].parse().unwrap(), x[4].parse().unwrap()),
+                    Range::new(x[6].parse().unwrap(), x[7].parse().unwrap()),
+                ]
+            })
+            .collect()
     }
 }
 
@@ -80,14 +81,17 @@ mod tests {
     fn day_four() {
         let ranges = DayFour::parse("input/day_4_input.txt".to_string());
 
-        let total_contained = ranges.iter().map(|x| {
-            x[0].contained(&x[1]) || x[1].contained(&x[0])
-        }).filter(|b| b == &true).fold(0, |acc, v| acc + 1);
+        let total_contained = ranges
+            .iter()
+            .map(|x| x[0].contained(&x[1]) || x[1].contained(&x[0]))
+            .filter(|b| b == &true)
+            .fold(0, |acc, v| acc + 1);
         println!("total contained: {}", total_contained);
-        let total_overlap = ranges.iter().map(|x| {
-            x[0].contained(&x[1]) || x[1].contained(&x[0]) || x[0].overlap(&x[1])
-        }).filter(|b| b == &true).fold(0, |acc, v| acc + 1);
+        let total_overlap = ranges
+            .iter()
+            .map(|x| x[0].contained(&x[1]) || x[1].contained(&x[0]) || x[0].overlap(&x[1]))
+            .filter(|b| b == &true)
+            .fold(0, |acc, v| acc + 1);
         println!("total overlap: {}", total_overlap);
     }
-
 }
