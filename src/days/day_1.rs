@@ -1,5 +1,5 @@
 use fs::File;
-use std::collections::{binary_heap, BinaryHeap};
+use std::collections::BinaryHeap;
 use std::fs;
 use std::io::Read;
 
