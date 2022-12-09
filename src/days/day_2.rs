@@ -50,19 +50,16 @@ impl DayTwo {
             .collect();
         let total_score = games
             .iter()
-            .map(|x| {
-                match_score(x)
-            })
+            .map(|x| match_score(x))
             .fold(0, |sum, val| sum + val);
 
         println!("My total score is for part one is {}", total_score);
 
-        let fixed: Vec<(RPS, RPS)> = games.iter().map(|x| {
-            manipulate(x)
-        }).collect();
-        let fixed_score = fixed.iter().map(|x| {
-            match_score(x)
-        }).fold(0, |acc, v| acc + v);
+        let fixed: Vec<(RPS, RPS)> = games.iter().map(|x| manipulate(x)).collect();
+        let fixed_score = fixed
+            .iter()
+            .map(|x| match_score(x))
+            .fold(0, |acc, v| acc + v);
         println!("My total score is for part two is {}", fixed_score);
 
         0
@@ -119,36 +116,28 @@ fn evaluate(game: &(RPS, RPS)) -> GameResult {
 }
 fn lose(game: &(RPS, RPS)) -> RPS {
     return match game.0 {
-        RPS::Rock => {
-            RPS::Scissors
+        RPS::Rock => RPS::Scissors,
+        RPS::Paper => RPS::Rock,
+        RPS::Scissors => RPS::Paper,
+        RPS::Error => {
+            panic!("This shouldn't happen")
         }
-        RPS::Paper => {
-            RPS::Rock
-        }
-        RPS::Scissors => {
-            RPS::Paper
-        }
-        RPS::Error => {panic!("This shouldn't happen")}
-    }
+    };
 }
 fn win(game: &(RPS, RPS)) -> RPS {
     return match game.0 {
-        RPS::Rock => {
-            RPS::Paper
+        RPS::Rock => RPS::Paper,
+        RPS::Paper => RPS::Scissors,
+        RPS::Scissors => RPS::Rock,
+        RPS::Error => {
+            panic!("This shouldn't happen")
         }
-        RPS::Paper => {
-            RPS::Scissors
-        }
-        RPS::Scissors => {
-            RPS::Rock
-        }
-        RPS::Error => { panic!("This shouldn't happen") }
-    }
+    };
 }
 fn manipulate(game: &(RPS, RPS)) -> (RPS, RPS) {
     return match game.1 {
         RPS::Rock => {
-        //     Lose
+            //     Lose
             (game.0.clone(), lose(game))
         }
         RPS::Paper => {
@@ -162,7 +151,7 @@ fn manipulate(game: &(RPS, RPS)) -> (RPS, RPS) {
         RPS::Error => {
             panic!("This shouldn't happen");
         }
-    }
+    };
 }
 impl Display for RPS {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
