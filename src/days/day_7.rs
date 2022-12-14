@@ -1,8 +1,8 @@
+use regex::{Captures, Match, Regex};
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 use std::fs::File;
 use std::io::Read;
-use regex::{Captures, Match, Regex};
 
 struct Directory {
     files: HashMap<String, u32>,
@@ -13,14 +13,18 @@ struct Directory {
 }
 impl Directory {
     fn add_dir(&mut self, name: String) {
-       match self.directories.get(&name) {
-           None => {
-               self.directories.insert(name.clone(), Directory::new(name.clone()));
-           }
-           Some(_) => {
-               println!("There was already a directory named {} in the directory named {}", name, self.name);
-           }
-       };
+        match self.directories.get(&name) {
+            None => {
+                self.directories
+                    .insert(name.clone(), Directory::new(name.clone()));
+            }
+            Some(_) => {
+                println!(
+                    "There was already a directory named {} in the directory named {}",
+                    name, self.name
+                );
+            }
+        };
     }
     fn new(name: String) -> Self {
         Directory {
@@ -28,7 +32,7 @@ impl Directory {
             directories: HashMap::new(),
             parent: None,
             name,
-            size_contained: 0
+            size_contained: 0,
         }
     }
     // fn change_directory(&mut self, name: String) -> &mut Directory {
@@ -41,13 +45,16 @@ impl Directory {
                 self.size_contained = self.size_contained + size;
             }
             Some(_) => {
-                println!("There was already a file named {} in the directory named {}", name, self.name);
+                println!(
+                    "There was already a file named {} in the directory named {}",
+                    name, self.name
+                );
             }
         };
     }
 }
 struct DaySeven {
-    out: Directory
+    out: Directory,
 }
 impl DaySeven {
     fn parse(filename: String) {
@@ -55,8 +62,12 @@ impl DaySeven {
         let mut f_string = String::new();
         let mut head = Directory::new("/".to_string());
         let mut current = &mut head;
-        file.read_to_string(&mut f_string).expect(&format!("Unable to open {}", &filename));
-        let re = Regex::new(r"/(\$ cd ([\w\/.]*)\n)|(\$ ls\n)|(dir ([\w.]{1,20})\n)|(([\d]{1,20}) ([\w.]{1,20})\n)").unwrap();
+        file.read_to_string(&mut f_string)
+            .expect(&format!("Unable to open {}", &filename));
+        let re = Regex::new(
+            r"/(\$ cd ([\w\/.]*)\n)|(\$ ls\n)|(dir ([\w.]{1,20})\n)|(([\d]{1,20}) ([\w.]{1,20})\n)",
+        )
+        .unwrap();
         let mut iter = f_string.lines();
         while let Some(line) = iter.next() {
             let cap = re.captures(line).unwrap();
@@ -71,23 +82,20 @@ impl DaySeven {
                 }
             }
             match cap.get(3) {
-            //     We need to iterate here until we get to another  cd or ls
-                None => {},
+                //     We need to iterate here until we get to another  cd or ls
+                None => {}
                 Some(_) => {
                     while let Some(entry) = iter.next() {
                         let line_cap = re.captures(entry).unwrap();
                         match line_cap.get(5) {
-                            None => {},
-                            Some(dir) => {
-                                match current.directories.get(dir.as_str()) {
-                                    None => {current.add_dir(dir.as_str().to_string())}
-                                    Some(_) => {}
-                                }
-                            }
+                            None => {}
+                            Some(dir) => match current.directories.get(dir.as_str()) {
+                                None => current.add_dir(dir.as_str().to_string()),
+                                Some(_) => {}
+                            },
                         }
                     }
                 }
-
             }
         }
     }
