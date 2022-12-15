@@ -16,6 +16,12 @@ impl DayEight {
         tree_height
     }
 }
+enum Direction {
+    North,
+    South,
+    East,
+    West
+}
 fn can_see_tree(height: &u32, highest: &u32) -> bool {
     height > highest
 }
