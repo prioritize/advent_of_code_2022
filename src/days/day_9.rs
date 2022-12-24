@@ -1,6 +1,6 @@
 use nom::character::complete::{alpha1, char, digit1};
 use nom::combinator::map;
-use nom::sequence::{separated_pair};
+use nom::sequence::separated_pair;
 use nom::IResult;
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
@@ -18,10 +18,7 @@ impl PartialEq for Position {
 }
 impl Position {
     fn new() -> Self {
-        Position {
-            row: 0,
-            col: 0,
-        }
+        Position { row: 0, col: 0 }
     }
 }
 impl Display for Position {
@@ -51,15 +48,19 @@ fn follow(head: Position, tail: Position) -> Position {
     }
     tail
 }
-fn move_diagonal(head: Position, tail:Position) -> Position {
+fn move_diagonal(head: Position, tail: Position) -> Position {
     let mut out = Position::new();
     match head.col - tail.col {
-        0 => {panic!("This should have been filtered out by the distance equation")}
+        0 => {
+            panic!("This should have been filtered out by the distance equation")
+        }
         i32::MIN..=-1 => out.col = tail.col - 1,
         1..=i32::MAX => out.col = tail.col + 1,
     }
     match head.row - tail.row {
-        0 => {panic!("This should have been filtered out by the distance equation")}
+        0 => {
+            panic!("This should have been filtered out by the distance equation")
+        }
         i32::MIN..=-1 => out.row = tail.row - 1,
         1..=i32::MAX => out.row = tail.row + 1,
     }
@@ -68,7 +69,7 @@ fn move_diagonal(head: Position, tail:Position) -> Position {
 fn move_row(head: Position, tail: Position) -> Position {
     let mut out = Position::new();
     match head.row - tail.row {
-        -1..=1 => {out.row = tail.row}
+        -1..=1 => out.row = tail.row,
         i32::MIN..=-2 => out.row = tail.row - 1,
         2..=i32::MAX => out.row = tail.row + 1,
     }
@@ -78,7 +79,7 @@ fn move_row(head: Position, tail: Position) -> Position {
 fn move_col(head: Position, tail: Position) -> Position {
     let mut out = Position::new();
     match head.col - tail.col {
-        -1..=1 => {out.col = tail.col}
+        -1..=1 => out.col = tail.col,
         i32::MIN..=-2 => out.col = tail.col - 1,
         2..=i32::MAX => out.col = tail.col + 1,
     }
@@ -93,10 +94,10 @@ impl Knot {
     fn new() -> Self {
         let mut hm = HashMap::new();
         hm.insert((0, 0), true);
-       Knot {
-           pos: Position::new(),
-           visited: hm,
-       }
+        Knot {
+            pos: Position::new(),
+            visited: hm,
+        }
     }
     fn position(&self) -> Position {
         self.pos
@@ -117,13 +118,9 @@ impl Rope {
         for _ in 0..length {
             knots.push(Knot::new());
         }
-        Rope {
-            knots,
-            length
-        }
-
+        Rope { knots, length }
     }
-    fn head(&mut self) -> &mut Knot{
+    fn head(&mut self) -> &mut Knot {
         &mut self.knots[0]
     }
     fn traverse(&mut self, movements: &Vec<Movement>) {
@@ -155,11 +152,15 @@ impl Rope {
     }
     fn move_tail(&mut self) {
         for idx in 1..self.knots.len() {
-            let head = self.knots.get(idx-1 as usize).unwrap().position();
+            let head = self.knots.get(idx - 1 as usize).unwrap().position();
             let tail = self.knots.get(idx).unwrap().position();
             let tail_pos = follow(head, tail);
             self.knots.get_mut(idx).unwrap().pos = tail_pos;
-            self.knots.get_mut(idx).unwrap().visited.insert((tail_pos.row, tail_pos.col), true);
+            self.knots
+                .get_mut(idx)
+                .unwrap()
+                .visited
+                .insert((tail_pos.row, tail_pos.col), true);
         }
     }
 }
@@ -227,7 +228,7 @@ fn parse_input(filename: String) -> Vec<Movement> {
 
 #[cfg(test)]
 mod tests {
-use super::*;
+    use super::*;
     #[test]
     fn test_part_1() {
         let movements = parse_input("input/day_9_input.txt".to_string());
@@ -244,7 +245,7 @@ use super::*;
         assert_ne!(0, movements.len());
         let mut rope = Rope::new(10);
         rope.traverse(&movements);
-        println!("{}", rope.knots[rope.length-1].visited.len())
+        println!("{}", rope.knots[rope.length - 1].visited.len())
     }
     #[test]
     fn test_part_2_example() {
@@ -253,6 +254,6 @@ use super::*;
         assert_ne!(0, movements.len());
         let mut rope = Rope::new(10);
         rope.traverse(&movements);
-        println!("{}", rope.knots[rope.length-1].visited.len())
+        println!("{}", rope.knots[rope.length - 1].visited.len())
     }
 }
